@@ -30,6 +30,12 @@ data class FlavorTokens(
     val strokeWidthSm: Dp = 2.dp,
 
     val shimmerHeight: Dp = 20.dp,
+
+    val skeletonAvatarSize: Dp = 48.dp,
+    val skeletonBlockHeight: Dp = 160.dp,
+    val skeletonLineHeightMd: Dp = 16.dp,
+    val skeletonLineHeightSm: Dp = 14.dp,
+    val skeletonLineHeightXs: Dp = 12.dp,
 ) {
     companion object {
         val Default = FlavorTokens()

@@ -19,9 +19,14 @@ gen/
 out/
 release/
 
-# Keystore files
+# Keystore & signing material
 *.jks
 *.keystore
+*.pem
+*.key
+*.gpg
+secring.*
+.env
 
 # IntelliJ
 *.iml

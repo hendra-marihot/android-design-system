@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.hendramarihot.flavor.theme.Flavor
 import com.hendramarihot.flavor.theme.FlavorTheme
 
@@ -27,9 +26,9 @@ fun FlavorListItemSkeleton(modifier: Modifier = Modifier) {
     ) {
         FlavorShimmer(
             modifier = Modifier
-                .size(48.dp)
+                .size(Flavor.tokens.skeletonAvatarSize)
                 .clip(CircleShape),
-            height = 48.dp,
+            height = Flavor.tokens.skeletonAvatarSize,
         )
         Spacer(modifier = Modifier.width(Flavor.tokens.spacingMd))
         Column(
@@ -38,11 +37,11 @@ fun FlavorListItemSkeleton(modifier: Modifier = Modifier) {
         ) {
             FlavorShimmer(
                 modifier = Modifier.fillMaxWidth(0.7f),
-                height = 16.dp,
+                height = Flavor.tokens.skeletonLineHeightMd,
             )
             FlavorShimmer(
                 modifier = Modifier.fillMaxWidth(0.5f),
-                height = 12.dp,
+                height = Flavor.tokens.skeletonLineHeightXs,
             )
         }
     }
