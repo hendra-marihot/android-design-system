@@ -36,3 +36,6 @@ secring.*
 # Misc
 .DS_Store
 *.class
+
+# Claude Code (local agent state)
+.claude/
