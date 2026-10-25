@@ -1,17 +1,13 @@
 # Flavor — Android Design System
 
+[![CI](https://github.com/hendra-marihot/android-design-system/actions/workflows/ci.yml/badge.svg)](https://github.com/hendra-marihot/android-design-system/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 A Jetpack Compose component library built around a tokenized design system, with a companion catalog app that exercises every component. This is a portfolio project — one in a series, each focused on a different competency expected of a senior mobile engineer. This one covers **design systems**: how to build a consistent, extensible component layer that scales across teams and brands.
 
-I'm primarily a Flutter engineer. I built this in Compose/Kotlin deliberately — design-system thinking shouldn't be locked to one framework, and the underlying problems (token management, API consistency, theming contracts) are the same regardless of toolkit.
+I ship production code on both Flutter and native Android. I built this one in Compose/Kotlin because design-system thinking shouldn't be locked to one framework — the underlying problems (token management, API consistency, theming contracts) are the same regardless of toolkit.
 
-<!-- TODO: Add 2-4 catalog screenshots
-     Suggested captures:
-     - Catalog home screen (light mode)
-     - Button screen showing all 5 variants + loading state
-     - Shimmer/Skeleton screen
-     - Any one screen in dark mode
-     Place images in a /screenshots directory and reference them here.
--->
+![Flavor catalog app: buttons with loading state, inputs, skeletons, theme tokens](docs/demo.gif)
 
 ## Why a design system
 
