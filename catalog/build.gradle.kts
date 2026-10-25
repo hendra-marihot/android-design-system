@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val javaVersion = JavaVersion.toVersion(libs.versions.java.get())
+
 android {
     namespace = "com.hendramarihot.flavor.catalog"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -17,8 +19,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 
     buildFeatures {
@@ -27,7 +29,7 @@ android {
 }
 
 kotlin {
-    jvmToolchain(libs.versions.java.get().toInt())
+    jvmToolchain(javaVersion.majorVersion.toInt())
 }
 
 dependencies {

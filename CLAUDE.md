@@ -17,6 +17,9 @@ on `:flavor` via `implementation(project(":flavor"))`.
 
 ## Build Commands
 
+Prerequisites: JDK 17 (the toolchain resolver downloads it when missing) and the API 37
+platform `platforms;android-37.0` (AGP installs it when the SDK licenses are accepted).
+
 ```bash
 # Library
 ./gradlew :flavor:assembleRelease          # Build release AAR

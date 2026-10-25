@@ -5,6 +5,8 @@ plugins {
     signing
 }
 
+val javaVersion = JavaVersion.toVersion(libs.versions.java.get())
+
 android {
     namespace = "com.hendramarihot.flavor"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -16,8 +18,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
 
     buildFeatures {
@@ -35,7 +37,7 @@ android {
 kotlin {
     // Kotlin compilation is AGP's built-in support. Pin the JDK so a newer
     // local JDK cannot leak its class library into Java 17 bytecode.
-    jvmToolchain(libs.versions.java.get().toInt())
+    jvmToolchain(javaVersion.majorVersion.toInt())
 }
 
 dependencies {

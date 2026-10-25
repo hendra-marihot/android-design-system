@@ -110,6 +110,8 @@ Each component has a Compose UI test in `androidTest` and a catalog screen. `Fla
 
 ## Build
 
+Needs JDK 17 and the API 37 platform (`platforms;android-37.0`). The toolchain resolver downloads the JDK when it is missing, and AGP installs the platform when the SDK licenses are accepted.
+
 ```bash
 ./gradlew :flavor:assembleRelease       # library AAR
 ./gradlew :catalog:assembleDebug        # catalog APK

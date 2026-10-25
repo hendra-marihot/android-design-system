@@ -2,6 +2,8 @@
 # Android SDK and Java release, read by the module build scripts
 compileSdk = "37"
 minSdk = "26"
+# targetSdk stays one behind compileSdk until the API 37 behaviour changes are reviewed.
+# OldTargetApi lint is expected.
 targetSdk = "36"
 java = "17"
 
