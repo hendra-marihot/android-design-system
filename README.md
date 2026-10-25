@@ -1,46 +1,45 @@
-# Flavor — Android Design System
+# Flavor: Android Design System
 
 [![CI](https://github.com/hendra-marihot/android-design-system/actions/workflows/ci.yml/badge.svg)](https://github.com/hendra-marihot/android-design-system/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-A Jetpack Compose component library built around a tokenized design system, with a companion catalog app that exercises every component. This is a portfolio project — one in a series, each focused on a different competency expected of a senior mobile engineer. This one covers **design systems**: how to build a consistent, extensible component layer that scales across teams and brands.
+A Jetpack Compose component library built on a token layer, plus a catalog app that exercises every component. It shows how I build a UI layer that stays consistent as a team and a product grow.
 
-I ship production code on both Flutter and native Android. I built this one in Compose/Kotlin because design-system thinking shouldn't be locked to one framework — the underlying problems (token management, API consistency, theming contracts) are the same regardless of toolkit.
+I ship on both Flutter and native Android. I built this one in Compose because the problems are the same in any toolkit: token management, API consistency and theming contracts.
 
 ![Flavor catalog app: buttons with loading state, inputs, skeletons, theme tokens](docs/demo.gif)
 
 ## Why a design system
 
-In every codebase I've worked on that lacked a design system, the same problems appeared: hardcoded colors that broke in dark mode, inconsistent spacing that made screens feel off, loading states that looked different on every page, and no shared language between design and engineering. Adding a new screen meant copying and tweaking from an existing one, which meant bugs propagated and visual drift compounded.
+Codebases without one show the same symptoms: hardcoded colors that break in dark mode, spacing that drifts from screen to screen, loading states that look different on every page, and no shared vocabulary between design and engineering. New screens get copied from old ones, and bugs come along.
 
-This project is my answer to those problems, scoped to the parts I think matter most: a token layer that centralizes design decisions, components with enforced API conventions, and a catalog app that proves the components actually work together.
+This library covers the parts that matter most: a token layer for design decisions, components with enforced API rules, and a catalog that proves the pieces work together.
 
 ## Key decisions
 
-### Token layer over raw Material 3
+### A token layer on top of Material 3
 
-Material 3 provides a color system, typography scale, and shape system out of the box. I chose to add `FlavorTokens` — an `@Immutable data class` delivered via `CompositionLocal` — on top of it for spacing, radius, elevation, and icon sizing. These are the values Material 3 doesn't opinionated for you, and they're exactly the ones that drift across a codebase when left to individual developers.
+Material 3 already provides color, typography and shape. `FlavorTokens`, an `@Immutable data class` delivered through a `CompositionLocal`, adds spacing, radius, elevation and icon sizes. Those are the values Material leaves open, and the ones that drift when every developer picks their own.
 
-The tradeoff: it's another layer of indirection. Every component reads `Flavor.tokens.spacingMd` instead of writing `16.dp`. That's more code for the same result — until you need to support a second brand, or a design refresh changes your spacing scale, and you change it in one place instead of across every file. The token class also accepts overrides through `FlavorTheme(tokens = ...)`, so per-tenant theming is a constructor call, not a fork.
+The cost is indirection. Components read `Flavor.tokens.spacingMd` instead of writing `16.dp`. The payoff comes when a second brand or a design refresh changes the scale: you change one place. `FlavorTheme(tokens = ...)` accepts overrides, so per-tenant theming is a constructor call.
 
-I deliberately kept color and typography tokens out. Material 3's `colorScheme` and `typography` already handle those well, and duplicating them would add indirection without solving a real problem.
+Color and typography tokens are left out on purpose. Material 3's `colorScheme` and `typography` handle them well.
 
-### API conventions as enforcement
+### API rules as enforcement
 
-Every composable in this library follows the same contract:
-- `modifier: Modifier = Modifier` is always the first optional parameter
-- No hardcoded colors — everything goes through `MaterialTheme.colorScheme`
-- No raw `Dp` literals for spacing, radius, or elevation — everything goes through `Flavor.tokens`
-- No `android.*` imports beyond `Configuration` (for preview annotations)
+Every composable follows the same contract:
+
+- `modifier: Modifier = Modifier` is the first optional parameter
+- No hardcoded colors. Everything goes through `MaterialTheme.colorScheme`
+- No raw `Dp` literals for spacing, radius or elevation. Everything goes through `Flavor.tokens`
+- No `android.*` imports except `Configuration` for previews
 - Light and dark `@Preview` on every component
 
-These rules are more valuable than any individual component. A design system that doesn't enforce its own conventions teaches the wrong habits. I wanted the library to be an example of the discipline, not just the output.
+The rules matter more than any single component. A design system that breaks its own conventions teaches the wrong habits.
 
 ### Library and catalog as separate modules
 
-The `:catalog` module is a standalone app that depends on `:flavor` via `implementation(project(":flavor"))`. This isn't just a demo — it's a constraint. The catalog can only use public API, which forces me to notice when a component's interface is awkward or incomplete. If I can't build a reasonable demo screen without reaching into internals, the API needs work.
-
-The catalog also uses type-safe navigation (Navigation 2.8+ with `@Serializable` route objects), which keeps the demo app itself idiomatic rather than a throwaway.
+`:catalog` depends on `:flavor` through `implementation(project(":flavor"))`, so it can only use the public API. If a demo screen cannot be built without reaching into internals, the API needs work. The catalog uses type-safe navigation with `@Serializable` routes, so it is a real app rather than a throwaway.
 
 ## Architecture
 
@@ -66,55 +65,62 @@ graph TD
     C -->|delegates to| M[MaterialTheme]
 ```
 
-`FlavorTheme` wraps `MaterialTheme` and injects the token `CompositionLocal`. Components read tokens via `Flavor.tokens` — a short accessor on the `Flavor` object. Consumers can override tokens at the theme level without touching component code.
+`FlavorTheme` wraps `MaterialTheme` and provides the token `CompositionLocal`. Components read tokens through `Flavor.tokens`. Consumers override tokens at the theme level without touching component code.
 
-## What's here
+## Components
 
 | Component | Wraps | Notable |
 |---|---|---|
-| `FlavorButton` | Button, FilledTonalButton, OutlinedButton, TextButton | 5 style variants via enum; loading state auto-disables and shows spinner |
-| `FlavorCard` | Card, OutlinedCard | 3 styles; optional `onClick` switches between clickable and static variants |
-| `FlavorTextField` | OutlinedTextField | Trailing icon supports optional click handler; error state with supporting text |
-| `FlavorDialog` | AlertDialog | Destructive mode colors confirm button with `error` |
-| `FlavorBottomSheet` | ModalBottomSheet | Exposes `SheetState` for caller control |
-| `FlavorShimmer` | — (custom) | Animated gradient sweep; theme-aware colors adapt to light/dark |
-| `FlavorCardSkeleton` | FlavorShimmer | Compositional — image + title + subtitle layout |
-| `FlavorListItemSkeleton` | FlavorShimmer | Compositional — circular avatar + two text lines |
-| `FlavorEmptyView` | — | Full-screen empty state; reuses `FlavorButton` for CTA |
-| `FlavorErrorView` | — | Full-screen error state with optional retry |
+| `FlavorButton` | Button, FilledTonalButton, OutlinedButton, TextButton | 5 variants via enum. Loading state disables the button and shows a spinner |
+| `FlavorCard` | Card, OutlinedCard | 3 styles. Optional `onClick` switches between clickable and static |
+| `FlavorTextField` | OutlinedTextField | Trailing icon with optional click handler. Error state with supporting text |
+| `FlavorDialog` | AlertDialog | Destructive mode colors the confirm button with `error` |
+| `FlavorBottomSheet` | ModalBottomSheet | Exposes `SheetState` to the caller |
+| `FlavorShimmer` | custom | Animated gradient sweep. Colors adapt to light and dark |
+| `FlavorCardSkeleton` | FlavorShimmer | Image, title and subtitle layout |
+| `FlavorListItemSkeleton` | FlavorShimmer | Avatar and two text lines |
+| `FlavorEmptyView` | custom | Full-screen empty state. Reuses `FlavorButton` for the action |
+| `FlavorErrorView` | custom | Full-screen error state with optional retry |
 
-Every component has a matching Compose UI test in `androidTest` and a dedicated catalog screen.
+Each component has a Compose UI test in `androidTest` and a catalog screen. `FlavorTokensTest` covers the token defaults on the JVM.
 
-## What's not here (and why)
+## Out of scope
 
-This is a scoped demonstration, not an attempt to replace Material 3.
+- **Typography and color tokens.** Material 3 covers them.
+- **Drawers, tabs, chips, snackbars, top bars.** The set covers distinct interaction types: input, action, feedback, loading, overlay. Ten consistent components show the system better than forty loose ones.
+- **Compose Multiplatform.** Android only. A cross-platform design system is a different project.
+- **A theme picker UI.** The token system supports it. Building the picker is catalog polish.
 
-- **No typography or color tokens.** Material 3 handles these well. Duplicating them would add indirection without solving a problem.
-- **No navigation drawers, tabs, chips, snackbars, top bars.** The component set covers different interaction models (input, action, feedback, loading, overlay) rather than trying to be exhaustive. Ten well-built components with consistent conventions demonstrate the system better than forty inconsistent ones.
-- **No Compose Multiplatform.** This targets Android only. Cross-platform design systems are a different problem with different tradeoffs — worth a separate project.
-- **No runtime theme switching UI.** The token system supports it (pass different `FlavorTokens` to `FlavorTheme`), but building a theme picker would be catalog polish, not a design-system concern.
+## What I would change
 
-## What I'd change
-
-- **Add screenshot tests.** The Compose UI tests verify behavior (clicks fire, loading disables, tokens propagate) but don't catch visual regressions. Paparazzi or Roborazzi would close that gap.
-- **Add accessibility test coverage.** Components inherit Material 3's semantics, but I'm not explicitly testing content descriptions, touch targets, or screen reader behavior. That's a gap.
-- **Tighten the skeleton components.** `FlavorCardSkeleton` and `FlavorListItemSkeleton` still have a few raw `Dp` literals (e.g., `160.dp` for image height, `48.dp` for avatar size) that should be tokens. I caught this pattern elsewhere but missed it in the skeletons.
-- **Generate Compose stability reports.** The `@Immutable` annotation on `FlavorTokens` helps, but I haven't configured the Compose compiler stability report to verify that all components are actually skippable. Worth adding for a library where recomposition performance matters.
+- **Add screenshot tests.** The UI tests check behavior, not pixels. Roborazzi or Paparazzi would catch visual regressions.
+- **Add accessibility tests.** Components inherit Material semantics, but content descriptions, touch targets and screen reader behavior are not tested.
+- **Tokenize the skeletons.** `FlavorCardSkeleton` and `FlavorListItemSkeleton` still use a few raw `Dp` values such as `160.dp` and `48.dp`.
+- **Enable Compose stability reports.** `FlavorTokens` is `@Immutable`, but the compiler report would confirm every component is skippable.
 
 ## Stack
 
 - Kotlin 2.1.21, Compose BOM 2025.05.01, Material 3
 - `compileSdk 35`, `minSdk 26`, JVM target 17
-- Navigation Compose 2.9 with `@Serializable` type-safe routes
-- GitHub Actions CI — builds both modules, runs tests and lint on every push/PR
-- Maven Central publishing pipeline (GPG signing, Sonatype OSSRH, POM metadata)
-- Version catalog (`libs.versions.toml`) for all dependency management
+- Navigation Compose 2.9 with `@Serializable` routes
+- GitHub Actions CI: builds both modules, runs tests and lint on every push and PR
+- Maven Central publishing configured: GPG signing, Sonatype OSSRH, POM metadata
+- Version catalog (`libs.versions.toml`) for every dependency
+
+## Build
+
+```bash
+./gradlew :flavor:assembleRelease       # library AAR
+./gradlew :catalog:assembleDebug        # catalog APK
+./gradlew test lint                     # unit tests and lint
+./gradlew connectedAndroidTest          # Compose UI tests, needs an emulator
+```
 
 ## Related repositories
 
-This is one piece of a portfolio covering different aspects of senior mobile engineering:
+Each repo in this set covers one area of mobile engineering.
 
-| Repository | Focus area |
+| Repository | Focus |
 |---|---|
 | [compose-newsreader](https://github.com/hendra-marihot/compose-newsreader) | Multi-module Android, Hilt, Room, offline-first |
 | **android-design-system** (this repo) | Compose component library, design tokens |
@@ -123,8 +129,8 @@ This is one piece of a portfolio covering different aspects of senior mobile eng
 | [flutter-expense-tracker](https://github.com/hendra-marihot/flutter-expense-tracker) | Clean Architecture, Riverpod, Drift, Material 3 |
 | [flutter-ui-toolkit](https://github.com/hendra-marihot/flutter-ui-toolkit) | Reusable widgets, shimmer, adaptive layouts |
 | [flutter-platform-bridge](https://github.com/hendra-marihot/flutter-platform-bridge) | Platform channels, native interop |
-| [mobile-ci-cd-templates](https://github.com/hendra-marihot/mobile-ci-cd-templates) | CI/CD, release automation, infrastructure |
+| [mobile-ci-cd-templates](https://github.com/hendra-marihot/mobile-ci-cd-templates) | CI/CD, release automation |
 
 ## License
 
-[Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+Copyright 2026 Hendra Marihot. Licensed under the [Apache License 2.0](LICENSE).
