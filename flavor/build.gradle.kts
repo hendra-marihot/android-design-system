@@ -35,8 +35,7 @@ android {
 }
 
 kotlin {
-    // Kotlin compilation is AGP's built-in support. Pin the JDK so a newer
-    // local JDK cannot leak its class library into Java 17 bytecode.
+    // Pin the JDK that runs the compilers so builds match across machines and CI.
     jvmToolchain(javaVersion.majorVersion.toInt())
 }
 

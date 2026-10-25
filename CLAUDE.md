@@ -17,8 +17,7 @@ on `:flavor` via `implementation(project(":flavor"))`.
 
 ## Build Commands
 
-Prerequisites: JDK 17 (the toolchain resolver downloads it when missing) and the API 37
-platform `platforms;android-37.0` (AGP installs it when the SDK licenses are accepted).
+Needs a JDK 17 or newer to run Gradle and the API 37 platform (`platforms;android-37.0`). If the local JDK is newer than 17, the toolchain resolver downloads JDK 17 for compilation. AGP installs the platform when the SDK licenses are accepted.
 
 ```bash
 # Library
