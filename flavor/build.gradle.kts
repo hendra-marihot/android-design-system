@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     `maven-publish`
     signing
@@ -8,21 +7,17 @@ plugins {
 
 android {
     namespace = "com.hendramarihot.flavor"
-    compileSdk = 35
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 26
+        minSdk = libs.versions.minSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
     }
 
     buildFeatures {
@@ -35,6 +30,12 @@ android {
             withJavadocJar()
         }
     }
+}
+
+kotlin {
+    // Kotlin compilation is AGP's built-in support. Pin the JDK so a newer
+    // local JDK cannot leak its class library into Java 17 bytecode.
+    jvmToolchain(libs.versions.java.get().toInt())
 }
 
 dependencies {

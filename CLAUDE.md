@@ -81,12 +81,13 @@ Key versions (as of last update):
 
 | Dependency | Version |
 |---|---|
-| AGP | 8.9.1 |
-| Kotlin | 2.1.21 |
-| Compose BOM | 2025.05.01 |
-| Lifecycle | 2.9.1 |
-| Navigation Compose | 2.9.0 |
-| Kotlinx Serialization | 1.7.3 |
+| Gradle | 9.7.1 |
+| AGP | 9.3.2 (built-in Kotlin, no `kotlin-android` plugin) |
+| Kotlin | 2.4.21 |
+| Compose BOM | 2026.09.00 |
+| Lifecycle | 2.11.0 |
+| Navigation Compose | 2.10.2 |
+| Kotlinx Serialization | 1.12.0 |
 
 ## Architecture Notes
 
@@ -110,4 +111,5 @@ Each component lives in its own package under `com.hendramarihot.flavor.<name>/`
 One composable per file, named `Flavor<Name>.kt`. Matching test in
 `src/androidTest/.../`. Matching catalog screen in `catalog/.../screens/`.
 
-SDK targets: `compileSdk = 35`, `minSdk = 26`, JVM target 17.
+SDK targets: `compileSdk = 37`, `minSdk = 26`, `targetSdk = 36` (catalog app), JDK 17 toolchain.
+They are read from `[versions]` in `gradle/libs.versions.toml`, so change them there.

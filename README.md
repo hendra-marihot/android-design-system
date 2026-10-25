@@ -100,9 +100,10 @@ Each component has a Compose UI test in `androidTest` and a catalog screen. `Fla
 
 ## Stack
 
-- Kotlin 2.1.21, Compose BOM 2025.05.01, Material 3
-- `compileSdk 35`, `minSdk 26`, JVM target 17
-- Navigation Compose 2.9 with `@Serializable` routes
+- Kotlin 2.4.21, Compose BOM 2026.09.00, Material 3
+- Gradle 9.7 and AGP 9.3 with built-in Kotlin
+- `compileSdk 37`, `minSdk 26`, JDK 17 toolchain
+- Navigation Compose 2.10 with `@Serializable` routes
 - GitHub Actions CI: builds both modules, runs tests and lint on every push and PR
 - Maven Central publishing configured: GPG signing, Sonatype OSSRH, POM metadata
 - Version catalog (`libs.versions.toml`) for every dependency
