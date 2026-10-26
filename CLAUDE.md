@@ -17,6 +17,8 @@ on `:flavor` via `implementation(project(":flavor"))`.
 
 ## Build Commands
 
+Needs a JDK 17 or newer to run Gradle and the API 37 platform (`platforms;android-37.0`). If the local JDK is newer than 17, the toolchain resolver downloads JDK 17 for compilation. AGP installs the platform when the SDK licenses are accepted.
+
 ```bash
 # Library
 ./gradlew :flavor:assembleRelease          # Build release AAR
@@ -81,12 +83,13 @@ Key versions (as of last update):
 
 | Dependency | Version |
 |---|---|
-| AGP | 8.9.1 |
-| Kotlin | 2.1.21 |
-| Compose BOM | 2025.05.01 |
-| Lifecycle | 2.9.1 |
-| Navigation Compose | 2.9.0 |
-| Kotlinx Serialization | 1.7.3 |
+| Gradle | 9.7.1 |
+| AGP | 9.3.2 (built-in Kotlin, no `kotlin-android` plugin) |
+| Kotlin | 2.4.21 |
+| Compose BOM | 2026.09.00 |
+| Lifecycle | 2.11.0 |
+| Navigation Compose | 2.10.2 |
+| Kotlinx Serialization | 1.12.0 |
 
 ## Architecture Notes
 
@@ -110,4 +113,5 @@ Each component lives in its own package under `com.hendramarihot.flavor.<name>/`
 One composable per file, named `Flavor<Name>.kt`. Matching test in
 `src/androidTest/.../`. Matching catalog screen in `catalog/.../screens/`.
 
-SDK targets: `compileSdk = 35`, `minSdk = 26`, JVM target 17.
+SDK targets: `compileSdk = 37`, `minSdk = 26`, `targetSdk = 36` (catalog app), JDK 17 toolchain.
+They are read from `[versions]` in `gradle/libs.versions.toml`, so change them there.
