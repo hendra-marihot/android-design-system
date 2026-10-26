@@ -7,9 +7,13 @@ minSdk = "26"
 targetSdk = "36"
 java = "17"
 
+# Library version published to Maven Central. A v<version> tag triggers the publish workflow.
+flavor = "0.1.0"
+
 # Build tools
 agp = "9.3.2"
 kotlin = "2.4.21"
+mavenPublish = "0.37.0"
 
 # Libraries
 composeBom = "2026.09.00"
@@ -42,3 +46,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }

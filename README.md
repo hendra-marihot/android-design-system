@@ -105,7 +105,7 @@ Each component has a Compose UI test in `androidTest` and a catalog screen. `Fla
 - `compileSdk 37`, `minSdk 26`, JDK 17 toolchain
 - Navigation Compose 2.10 with `@Serializable` routes
 - GitHub Actions CI: builds both modules, runs tests and lint on every push and PR
-- Maven Central publishing configured: GPG signing, Sonatype OSSRH, POM metadata
+- Maven Central publishing through the Central Portal: a `v*` tag signs and uploads the AAR
 - Version catalog (`libs.versions.toml`) for every dependency
 
 ## Build
@@ -117,6 +117,18 @@ Needs a JDK 17 or newer to run Gradle and the API 37 platform (`platforms;androi
 ./gradlew :catalog:assembleDebug        # catalog APK
 ./gradlew test lint                     # unit tests and lint
 ./gradlew connectedAndroidTest          # Compose UI tests, needs an emulator
+```
+
+## Publishing
+
+Pushing a tag `vX.Y.Z` runs the [publish workflow](.github/workflows/publish.yml). It checks that the tag matches `flavor` in `gradle/libs.versions.toml`, then signs the release AAR with its sources and javadoc jars and uploads it to Maven Central through the Central Portal. OSSRH, the old staging host, shut down in June 2025.
+
+The workflow needs four repository secrets: `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` from a Central Portal user token, `SIGNING_KEY` as an ASCII-armored private GPG key, and `SIGNING_KEY_PASSWORD`. The `com.hendramarihot` namespace must be verified on the portal first, which means a DNS TXT record on the domain.
+
+To inspect the artifacts without publishing:
+
+```bash
+./gradlew :flavor:publishToMavenLocal   # writes to ~/.m2/repository/com/hendramarihot/flavor
 ```
 
 ## Related repositories

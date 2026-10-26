@@ -35,14 +35,18 @@ Needs a JDK 17 or newer to run Gradle and the API 37 platform (`platforms;androi
 
 ## Maven Publishing
 
-Coordinates: `com.hendramarihot:flavor:0.1.0`
+Coordinates: `com.hendramarihot:flavor:<version>`, with the version in `gradle/libs.versions.toml` as `flavor`.
 
-The `maven-publish` plugin is applied in `flavor/build.gradle.kts`. The publication is
-registered as `"release"` under groupId `com.hendramarihot`, artifactId `flavor`,
-version `0.1.0`.
+`flavor/build.gradle.kts` applies `com.vanniktech.maven.publish`, which configures the
+release variant with sources and javadoc jars, POM metadata, GPG signing and the Maven
+Central Portal upload. Do not add `maven-publish` or `signing` by hand; the plugin owns them.
 
-Full Maven Central publishing is configured: POM metadata, GPG signing (in-memory
-PGP keys via env vars), and Sonatype OSSRH repository.
+Releasing: bump `flavor` in the catalog, merge, then push a tag `v<version>`. The publish
+workflow verifies the tag against the catalog and runs `publishAndReleaseToMavenCentral`.
+Secrets: `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD` (portal user token),
+`SIGNING_KEY` (ASCII-armored private key), `SIGNING_KEY_PASSWORD`.
+
+Local check without credentials: `./gradlew :flavor:publishToMavenLocal`.
 
 ## Component API Conventions
 
