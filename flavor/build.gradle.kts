@@ -68,16 +68,16 @@ mavenPublishing {
     )
     publishToMavenCentral()
 
-    // Sign only when a key is configured, so publishToMavenLocal works on a
-    // machine without one. The publish workflow always provides the key, and
-    // the Central Portal rejects unsigned uploads if it is ever missing.
-    val signingKeyConfigured = providers.gradleProperty("signingInMemoryKey").isPresent ||
-        providers.gradleProperty("signing.keyId").isPresent
-    if (signingKeyConfigured) {
+    // Sign only when the in-memory key is configured, so publishToMavenLocal
+    // works on a machine without one. The publish workflow always provides the
+    // key, and the Central Portal rejects unsigned uploads if it is ever missing.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
         signAllPublications()
     }
 
-    coordinates("com.hendramarihot", "flavor", libs.versions.flavor.get())
+    // io.github.<user> namespaces are verified through the GitHub account on the
+    // Central Portal. A custom domain would need a DNS TXT record instead.
+    coordinates("io.github.hendra-marihot", "flavor", libs.versions.flavor.get())
 
     pom {
         name.set("Flavor")

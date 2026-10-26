@@ -35,14 +35,18 @@ Needs a JDK 17 or newer to run Gradle and the API 37 platform (`platforms;androi
 
 ## Maven Publishing
 
-Coordinates: `com.hendramarihot:flavor:<version>`, with the version in `gradle/libs.versions.toml` as `flavor`.
+Coordinates: `io.github.hendra-marihot:flavor:<version>`, with the version in `gradle/libs.versions.toml`
+as `flavor`. The Android package stays `com.hendramarihot.flavor`; only the Maven group uses the
+GitHub namespace, which the Central Portal verifies without DNS.
 
 `flavor/build.gradle.kts` applies `com.vanniktech.maven.publish`, which configures the
-release variant with sources and javadoc jars, POM metadata, GPG signing and the Maven
-Central Portal upload. Do not add `maven-publish` or `signing` by hand; the plugin owns them.
+release variant with a sources jar and an empty javadoc jar (Central requires one; Dokka is
+a possible follow-up), POM metadata, GPG signing and the Central Portal upload. Do not add
+`maven-publish` or `signing` by hand; the plugin owns them.
 
-Releasing: bump `flavor` in the catalog, merge, then push a tag `v<version>`. The publish
-workflow verifies the tag against the catalog and runs `publishAndReleaseToMavenCentral`.
+Releasing: bump `flavor` in the catalog, merge, then push a tag `v<version>` from `main`. The
+publish workflow verifies the tag against the catalog and against `main`, runs the library tests
+and lint, then runs `publishAndReleaseToMavenCentral` in the `maven-central` environment.
 Secrets: `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD` (portal user token),
 `SIGNING_KEY` (ASCII-armored private key), `SIGNING_KEY_PASSWORD`.
 
