@@ -1,8 +1,11 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.compose.compiler)
-    `maven-publish`
-    signing
+    alias(libs.plugins.maven.publish)
 }
 
 val javaVersion = JavaVersion.toVersion(libs.versions.java.get())
@@ -24,13 +27,6 @@ android {
 
     buildFeatures {
         compose = true
-    }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
     }
 }
 
@@ -58,66 +54,52 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
 }
 
-val libraryVersion = "0.1.0"
+// Maven Central through the Central Portal. The plugin configures the release
+// variant with sources and javadoc jars, the POM, GPG signing and the upload.
+// Credentials and the signing key come from Gradle properties or the
+// ORG_GRADLE_PROJECT_* environment variables set by the publish workflow.
+mavenPublishing {
+    configure(
+        AndroidSingleVariantLibrary(
+            javadocJar = JavadocJar.Empty(),
+            sourcesJar = SourcesJar.Sources(),
+            variant = "release",
+        ),
+    )
+    publishToMavenCentral()
 
-publishing {
-    publications {
-        register<MavenPublication>("release") {
-            groupId = "com.hendramarihot"
-            artifactId = "flavor"
-            version = libraryVersion
-            afterEvaluate {
-                from(components["release"])
-            }
-            pom {
-                name.set("Flavor")
-                description.set("Jetpack Compose design system library with Material 3 components and customizable design tokens")
-                url.set("https://github.com/hendra-marihot/android-design-system")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("hendra-marihot")
-                        name.set("Hendra Marihot")
-                        email.set("hendra.marihot@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/hendra-marihot/android-design-system.git")
-                    developerConnection.set("scm:git:ssh://github.com/hendra-marihot/android-design-system.git")
-                    url.set("https://github.com/hendra-marihot/android-design-system")
-                }
-            }
-        }
+    // Sign only when the in-memory key is configured, so publishToMavenLocal
+    // works on a machine without one. The publish workflow always provides the
+    // key, and the Central Portal rejects unsigned uploads if it is ever missing.
+    if (providers.gradleProperty("signingInMemoryKey").isPresent) {
+        signAllPublications()
     }
-    repositories {
-        maven {
-            name = "sonatype"
-            val releasesUrl = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            val snapshotsUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-            url = if (libraryVersion.endsWith("SNAPSHOT")) snapshotsUrl else releasesUrl
-            credentials {
-                username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME") ?: ""
-                password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD") ?: ""
+
+    // io.github.<user> namespaces are verified through the GitHub account on the
+    // Central Portal. A custom domain would need a DNS TXT record instead.
+    coordinates("io.github.hendra-marihot", "flavor", libs.versions.flavor.get())
+
+    pom {
+        name.set("Flavor")
+        description.set("Jetpack Compose design system library with Material 3 components and customizable design tokens")
+        url.set("https://github.com/hendra-marihot/android-design-system")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
+        developers {
+            developer {
+                id.set("hendra-marihot")
+                name.set("Hendra Marihot")
+                email.set("hendra.marihot@gmail.com")
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/hendra-marihot/android-design-system.git")
+            developerConnection.set("scm:git:ssh://github.com/hendra-marihot/android-design-system.git")
+            url.set("https://github.com/hendra-marihot/android-design-system")
+        }
     }
-}
-
-signing {
-    val signingKeyId = findProperty("signing.keyId") as String? ?: System.getenv("SIGNING_KEY_ID")
-    val signingKey = findProperty("signing.key") as String? ?: System.getenv("SIGNING_KEY")
-    val signingPassword = findProperty("signing.password") as String? ?: System.getenv("SIGNING_PASSWORD")
-    if (signingKeyId != null && signingKey != null && signingPassword != null) {
-        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-        sign(publishing.publications["release"])
-    }
-}
-
-tasks.withType<Sign>().configureEach {
-    isRequired = !libraryVersion.endsWith("SNAPSHOT")
 }

@@ -105,7 +105,7 @@ Each component has a Compose UI test in `androidTest` and a catalog screen. `Fla
 - `compileSdk 37`, `minSdk 26`, JDK 17 toolchain
 - Navigation Compose 2.10 with `@Serializable` routes
 - GitHub Actions CI: builds both modules, runs tests and lint on every push and PR
-- Maven Central publishing configured: GPG signing, Sonatype OSSRH, POM metadata
+- Maven Central publishing through the Central Portal: a `v*` tag signs and uploads the AAR
 - Version catalog (`libs.versions.toml`) for every dependency
 
 ## Build
@@ -117,6 +117,20 @@ Needs a JDK 17 or newer to run Gradle and the API 37 platform (`platforms;androi
 ./gradlew :catalog:assembleDebug        # catalog APK
 ./gradlew test lint                     # unit tests and lint
 ./gradlew connectedAndroidTest          # Compose UI tests, needs an emulator
+```
+
+## Publishing
+
+Coordinates: `io.github.hendra-marihot:flavor`. The version is `flavor` in `gradle/libs.versions.toml`.
+
+Pushing a tag `vX.Y.Z` runs the [publish workflow](.github/workflows/publish.yml). A `verify` job checks that the tag matches the catalog version and points at a commit on `main`, then runs the library tests and lint. A `publish` job then signs the release AAR, its sources jar and an empty javadoc jar, which Central requires, and uploads them to Maven Central through the Central Portal. OSSRH, the old staging host, shut down in June 2025.
+
+The `publish` job runs in the `maven-central` environment, so the four secrets can live there: `MAVEN_CENTRAL_USERNAME` and `MAVEN_CENTRAL_PASSWORD` from a Central Portal user token, `SIGNING_KEY` as an ASCII-armored private GPG key, and `SIGNING_KEY_PASSWORD`. Adding a required reviewer to the environment turns every release into a manual approval. The `io.github.hendra-marihot` namespace is verified through the GitHub account on the portal.
+
+To inspect the artifacts without publishing:
+
+```bash
+./gradlew :flavor:publishToMavenLocal   # writes to ~/.m2/repository/io/github/hendra-marihot/flavor
 ```
 
 ## Related repositories
